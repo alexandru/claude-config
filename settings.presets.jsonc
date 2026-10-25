@@ -10,7 +10,7 @@
   // agent-templates/<name>.md.
   "p-opus": {
     "model": "claude-opus-5-5",
-    "effortLevel": "high",
+    "effortLevel": "medium",
     "agents": {
       "Junior": {
         "model": "claude-haiku-5-5",
