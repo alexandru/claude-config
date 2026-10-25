@@ -1,0 +1,22 @@
+{
+  // ----------------------------------------------------------------------------------
+  // The default preset
+  "default": {
+    "extends": ["p-opus"],
+  },
+  // ----------------------------------------------------------------------------------
+  // Orchestrator / Solo models (main agents). Junior's model and effort are set
+  // in agents/Junior.md, because Claude Code reads them from the agent definition.
+  "p-opus": {
+    "model": "claude-opus-5-5",
+    "effortLevel": "high",
+  },
+  "p-fable": {
+    "model": "claude-fable-5-1",
+    "effortLevel": "medium",
+  },
+  "p-sonnet": {
+    "model": "claude-sonnet-5-5",
+    "effortLevel": "high",
+  },
+}
