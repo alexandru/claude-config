@@ -23,7 +23,7 @@ from pathlib import Path
 from types import ModuleType
 from unittest import mock
 
-TOOL_PATH = Path(__file__).resolve().parent / "claude-switch.py"
+TOOL_PATH = Path(__file__).resolve().parent.parent / "bin" / "claude-switch.py"
 
 
 def load_tool() -> ModuleType:

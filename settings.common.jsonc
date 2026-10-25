@@ -16,6 +16,7 @@
       "Agent(Explore)",
       "Agent(Plan)",
       "Agent(general-purpose)",
+      "Agent(claude)",
       "Agent(claude-code-guide)",
       "Edit(~/.agents/skills/**)",
       "Edit(~/.claude/skills/**)",
