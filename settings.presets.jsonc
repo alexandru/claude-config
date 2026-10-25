@@ -5,18 +5,37 @@
     "extends": ["p-opus"],
   },
   // ----------------------------------------------------------------------------------
-  // Orchestrator / Solo models (main agents). Junior's model and effort are set
-  // in agents/Junior.md, because Claude Code reads them from the agent definition.
+  // `model` and `effortLevel` apply to the main agents (Orchestrator / Solo).
+  // `agents` entries set the frontmatter of agents/<name>.md, generated from
+  // agent-templates/<name>.md.
   "p-opus": {
     "model": "claude-opus-5-5",
     "effortLevel": "high",
+    "agents": {
+      "Junior": {
+        "model": "claude-haiku-5-5",
+        "effort": "high",
+      },
+    },
   },
   "p-fable": {
     "model": "claude-fable-5-1",
     "effortLevel": "medium",
+    "agents": {
+      "Junior": {
+        "model": "claude-haiku-5-5",
+        "effort": "high",
+      },
+    },
   },
   "p-sonnet": {
     "model": "claude-sonnet-5-5",
     "effortLevel": "high",
+    "agents": {
+      "Junior": {
+        "model": "claude-haiku-5-5",
+        "effort": "high",
+      },
+    },
   },
 }

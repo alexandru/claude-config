@@ -64,7 +64,7 @@ Copilot CLI, Codex, and Pi can share them.
 
 ### Choose a configuration preset (optional)
 
-The [claude-switch](./bin/claude-switch.py) utility is for quickly switching between multiple setting presets (e.g., the model and effort of the main agents). It's built with Python 🐍, so you need [pipx](https://pipx.pypa.io/) installed (`make install-pipx`).
+The [claude-switch](./bin/claude-switch.py) utility is for quickly switching between multiple setting presets (e.g., multiple sets of models assigned to your agents). It's built with Python 🐍, so you need [pipx](https://pipx.pypa.io/) installed (`make install-pipx`).
 
 ```sh
 # Example
@@ -75,9 +75,6 @@ The switcher generates `settings.json` (Claude Code's user settings file) from:
 
 - [settings.common.jsonc](./settings.common.jsonc)
 - [settings.presets.jsonc](./settings.presets.jsonc)
-
-`make` leaves an existing `settings.json` untouched; run `./bin/claude-switch default` to replace it.
-Settings that Claude Code saves itself, such as the theme or a `/model` choice, are overwritten on the next switch.
 </details>
 
 <details>
@@ -128,22 +125,23 @@ Then install Cellar via Coursier:
 
 Main agents:
 
-- [Orchestrator](./agents/Orchestrator.md) (default agent): designs and implements changes; delegates evidence, research, and execution to Junior.
-- [Solo](./agents/Solo.md): designs and implements changes; works directly.
+- [Orchestrator](./agent-templates/Orchestrator.md) (default agent): designs and implements changes; delegates evidence, research, and execution to Junior.
+- [Solo](./agent-templates/Solo.md): designs and implements changes; works directly.
 
 Sub-agents:
 
-- [Junior](./agents/Junior.md): codebase and external evidence gathering, bounded execution, mechanical work.
+- [Junior](./agent-templates/Junior.md): codebase and external evidence gathering, bounded execution, mechanical work.
 
 Start a Solo session with `claude --agent Solo`.
 
 ## Shared skills
 
-- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.1.1)
+- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.2.1)
   - `code-review`: user-invoked adapter for `code-reviewing`.
   - `code-reviewing`: review changed code for bugs, structural problems, performance issues, and unintended behavior.
   - `code-refine`: behavior-preserving refinement using the `code-refinements` lenses.
   - `code-refinements`: refinement lenses of constraints, simplicity, and parametricity.
+  - `external-research`: research external documentation, public repositories, and dependency artifacts with a persistent cache.
 - [mattpocock/skills](https://github.com/mattpocock/skills/tree/v1.3.1)
   - `codebase-design`: deep-module design vocabulary and principles.
   - `diagnosing-bugs`: disciplined diagnosis for hard bugs and regressions.

@@ -97,29 +97,102 @@ class ReadJsoncTest(unittest.TestCase):
                 tool.read_jsonc_object(path)
 
 
-class SummaryTest(unittest.TestCase):
-    def test_lists_the_main_session_settings(self) -> None:
+JUNIOR = """---
+name: Junior
+description: "Use for evidence."
+model: sonnet
+effort: low
+disallowedTools: Agent
+---
+
+You are Junior.
+model: body lines stay untouched
+"""
+
+
+class UpdateFrontmatterTest(unittest.TestCase):
+    def test_replaces_settings_after_the_description(self) -> None:
+        updated = tool.update_frontmatter(
+            JUNIOR, {"model": "claude-sonnet-5-5", "effort": "high"}
+        )
+        self.assertEqual(
+            updated,
+            JUNIOR.replace(
+                "model: sonnet\neffort: low", "model: claude-sonnet-5-5\neffort: high"
+            ),
+        )
+
+    def test_omitted_keys_are_removed(self) -> None:
+        updated = tool.update_frontmatter(JUNIOR, {"model": "claude-haiku-5-5"})
+        self.assertNotIn("effort:", updated)
+        self.assertIn(
+            'description: "Use for evidence."\nmodel: claude-haiku-5-5\n', updated
+        )
+        self.assertIn("model: body lines stay untouched", updated)
+
+    def test_rejects_definitions_without_frontmatter(self) -> None:
+        with self.assertRaises(tool.ConfigError):
+            tool.update_frontmatter("You are Junior.\n", {"model": "sonnet"})
+
+
+class AgentSettingsTest(unittest.TestCase):
+    def test_rejects_unsupported_keys(self) -> None:
+        with self.assertRaises(tool.ConfigError) as raised:
+            tool.agent_settings({"agents": {"Junior": {"tools": "Read"}}})
+        self.assertIn("unsupported key 'tools'", str(raised.exception))
+
+    def test_rejects_values_that_are_not_plain_scalars(self) -> None:
+        with self.assertRaises(tool.ConfigError):
+            tool.agent_settings({"agents": {"Junior": {"model": "x\ntools: Bash"}}})
+
+
+class AgentTableTest(unittest.TestCase):
+    def test_main_agent_uses_settings_then_configured_agents(self) -> None:
         config = {
             "agent": "Orchestrator",
             "model": "claude-opus-5-5",
             "effortLevel": "high",
-            "permissions": {"defaultMode": "auto"},
         }
+        agents = {"Junior": {"model": "claude-sonnet-5-5", "effort": "high"}}
         self.assertEqual(
-            tool.format_summary(config),
+            tool.format_agent_table(config, agents),
             "\n"
-            "  agent       │ Orchestrator\n"
-            "  model       │ claude-opus-5-5\n"
-            "  effortLevel │ high\n"
+            "  Agent        │ Model             │ Effort\n"
+            "  ─────────────┼───────────────────┼───────\n"
+            "  Orchestrator │ claude-opus-5-5   │ high\n"
+            "  Junior       │ claude-sonnet-5-5 │ high\n"
             "\n",
         )
 
-    def test_without_main_session_settings_there_is_no_summary(self) -> None:
-        self.assertIsNone(tool.format_summary({"permissions": {}}))
+    def test_without_models_there_is_no_table(self) -> None:
+        self.assertIsNone(tool.format_agent_table({"permissions": {}}, {}))
+
+
+SOLO = """---
+name: Solo
+description: "Use for judgment."
+---
+
+You are Solo.
+"""
+
+
+def write_config(config_dir: Path, common: object, presets: object) -> None:
+    (config_dir / tool.COMMON_FILE).write_text(json.dumps(common), encoding="utf-8")
+    (config_dir / tool.PRESETS_FILE).write_text(json.dumps(presets), encoding="utf-8")
+    templates = config_dir / tool.TEMPLATES_DIR
+    templates.mkdir()
+    (templates / "Junior.md").write_text(JUNIOR, encoding="utf-8")
+    (templates / "Solo.md").write_text(SOLO, encoding="utf-8")
+
+
+def read_agent(config_dir: Path, name: str) -> str:
+    path: Path = config_dir / tool.AGENTS_DIR / f"{name}.md"
+    return path.read_text(encoding="utf-8")
 
 
 class SwitchTest(unittest.TestCase):
-    def test_merges_common_settings_with_the_resolved_preset(self) -> None:
+    def test_writes_settings_and_generates_agents_from_templates(self) -> None:
         common = {
             "agent": "Orchestrator",
             "env": {"CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "16"},
@@ -134,16 +207,12 @@ class SwitchTest(unittest.TestCase):
                 "extends": ["base"],
                 "model": "claude-opus-5-5",
                 "effortLevel": "high",
+                "agents": {"Junior": {"model": "claude-sonnet-5-5", "effort": "high"}},
             },
         }
         with tempfile.TemporaryDirectory() as tmp:
             config_dir = Path(tmp)
-            (config_dir / tool.COMMON_FILE).write_text(
-                json.dumps(common), encoding="utf-8"
-            )
-            (config_dir / tool.PRESETS_FILE).write_text(
-                json.dumps(presets), encoding="utf-8"
-            )
+            write_config(config_dir, common, presets)
             stdout = io.StringIO()
             with (
                 mock.patch.object(tool, "CONFIG_DIR", config_dir),
@@ -152,6 +221,11 @@ class SwitchTest(unittest.TestCase):
                 tool.switch("p-opus")
             written = json.loads(
                 (config_dir / tool.OUTPUT_FILE).read_text(encoding="utf-8")
+            )
+            junior = read_agent(config_dir, "Junior")
+            solo = read_agent(config_dir, "Solo")
+            template = (config_dir / tool.TEMPLATES_DIR / "Junior.md").read_text(
+                encoding="utf-8"
             )
 
         self.assertEqual(
@@ -167,15 +241,59 @@ class SwitchTest(unittest.TestCase):
                 "effortLevel": "high",
             },
         )
+        self.assertIn("model: claude-sonnet-5-5\neffort: high\n", junior)
+        self.assertEqual(solo, SOLO)
+        self.assertEqual(template, JUNIOR)
         self.assertEqual(
             stdout.getvalue(),
             "✓ Successfully switched to preset: p-opus\n"
             "✓ Generated settings.json\n"
+            "✓ Generated agents/Junior.md\n"
+            "✓ Generated agents/Solo.md\n"
             "\n"
-            "  agent       │ Orchestrator\n"
-            "  model       │ claude-opus-5-5\n"
-            "  effortLevel │ high\n"
+            "  Agent        │ Model             │ Effort\n"
+            "  ─────────────┼───────────────────┼───────\n"
+            "  Orchestrator │ claude-opus-5-5   │ high\n"
+            "  Junior       │ claude-sonnet-5-5 │ high\n"
             "\n",
+        )
+
+    def test_agents_a_preset_omits_do_not_keep_earlier_models(self) -> None:
+        presets = {
+            "a": {"agents": {"Junior": {"model": "claude-haiku-5-5", "effort": "low"}}},
+            "b": {"model": "claude-opus-5-5"},
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = Path(tmp)
+            write_config(config_dir, {}, presets)
+            with (
+                mock.patch.object(tool, "CONFIG_DIR", config_dir),
+                mock.patch("sys.stdout", io.StringIO()),
+            ):
+                tool.switch("a")
+                tool.switch("b")
+            junior = read_agent(config_dir, "Junior")
+        self.assertEqual(junior, JUNIOR.replace("model: sonnet\neffort: low\n", ""))
+
+    def test_agents_without_templates_write_nothing(self) -> None:
+        presets = {
+            "p": {
+                "model": "claude-opus-5-5",
+                "agents": {"../Nobody": {"model": "sonnet"}},
+            }
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = Path(tmp)
+            write_config(config_dir, {}, presets)
+            with (
+                mock.patch.object(tool, "CONFIG_DIR", config_dir),
+                self.assertRaises(tool.ConfigError) as raised,
+            ):
+                tool.switch("p")
+            self.assertFalse((config_dir / tool.OUTPUT_FILE).exists())
+            self.assertFalse((config_dir / tool.AGENTS_DIR).exists())
+        self.assertIn(
+            "without a template in agent-templates/: ../Nobody", str(raised.exception)
         )
 
     def test_hides_common_presets_from_selection_help(self) -> None:
