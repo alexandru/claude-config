@@ -5,54 +5,17 @@ Part of [alexandru/agents-config](https://github.com/alexandru/agents-config).
 ## Installation
 
 <details>
-<summary>STEP 1 — Clone the repository</summary>
+<summary>STEP 1 — Install</summary>
 
-### Clone the repository
-
-**WARN** — This is for a fresh Claude Code installation (no history):
-
-```sh
-git clone https://github.com/alexandru/claude-config.git ~/.claude &&
-  git -C ~/.claude config --local status.showUntrackedFiles no
-```
-
-**WARN:** This is Claude Code's working directory, so you may already have a `~/.claude` that you may need to delete, in which case you could lose all your sessions. An alternative would be...
+### Install
 
 ```bash
-(
-  set -e
-  if [[ -d ~/.claude ]]; then
-    # Clones in temporary directory
-    git clone https://github.com/alexandru/claude-config.git /tmp/claude-config
-    echo
-    # Sync all the files from clone to your working dir
-    rsync -rlcv /tmp/claude-config/ ~/.claude/
-    # Doing some index cleanup
-    cd ~/.claude
-    git pull
-    git config --local status.showUntrackedFiles no
-    # Cleanup
-    rm -rf /tmp/claude-config
-  else
-    git clone https://github.com/alexandru/claude-config.git ~/.claude
-    git -C ~/.claude config --local status.showUntrackedFiles no
-  fi
-)
+curl -fsSL https://alexandru.github.io/claude-config/install.sh | bash
 ```
 
 If the path isn't standard, you may need to set this in your `~/.zshrc`, `~/.bashrc` or `~/.profile`:
 ```sh
 export CLAUDE_CONFIG_DIR=/absolute/path/to/claude-config
-```
-</details>
-
-<details>
-<summary>STEP 2 — Install dependencies</summary>
-
-### Install dependencies
-
-```sh
-cd ~/.claude && make
 ```
 
 The skills are installed under `~/.agents/skills`, where Claude Code, OpenCode,
@@ -60,7 +23,7 @@ Copilot CLI, Codex, and Pi can share them.
 </details>
 
 <details>
-<summary>STEP 3 — Choose a configuration preset (optional)</summary>
+<summary>STEP 2 — Choose a configuration preset (optional)</summary>
 
 ### Choose a configuration preset (optional)
 
@@ -68,7 +31,7 @@ The [claude-switch](./bin/claude-switch.py) utility is for quickly switching bet
 
 ```sh
 # Example
-./bin/claude-switch p-fable
+~/.claude/bin/claude-switch p-fable
 ```
 
 The switcher generates `settings.json` (Claude Code's user settings file) from:
@@ -78,7 +41,7 @@ The switcher generates `settings.json` (Claude Code's user settings file) from:
 </details>
 
 <details>
-<summary>STEP 4 — Install Cellar (optional)</summary>
+<summary>STEP 3 — Install Cellar (optional)</summary>
 
 ### Install Cellar (optional)
 
