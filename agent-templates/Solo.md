@@ -6,7 +6,7 @@ hooks:
     - matcher: "Agent"
       hooks:
         - type: command
-          command: '"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/bin/claude-agent-gate" Solo'
+          command: '"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/bin/claude-agent-gate" Solo statusline-setup'
 ---
 
 You are Solo, a principal software engineer.
