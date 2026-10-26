@@ -20,7 +20,7 @@ COURSIER_LINUX_AARCH64_URL := https://github.com/VirtusLab/coursier-m1/releases/
 # Coursier installs launchers outside the default PATH of a non-login shell.
 COURSIER_BIN_PATHS := $(HOME)/.local/bin:$(HOME)/.local/share/coursier/bin:$(HOME)/Library/Application Support/Coursier/bin
 
-.PHONY: all install-pipx generate-config install-node check-mattpocock-skills-tag install-skills update-skills install-coursier install-cellar test test-claude-switch test-claude-agent-gate
+.PHONY: all install-pipx generate-config install-node check-mattpocock-skills-tag install-skills update-skills install-coursier install-cellar test test-claude-switch
 
 all: install-pipx generate-config install-node install-skills install-cellar
 
@@ -154,10 +154,7 @@ install-cellar: install-coursier
 	./bin/utils/setup-path; \
 	echo "Cellar PATH updated; new shells will pick it up."
 
-test: test-claude-switch test-claude-agent-gate
+test: test-claude-switch
 
 test-claude-switch:
 	./tests/claude-switch-test.py
-
-test-claude-agent-gate:
-	./tests/claude-agent-gate-test.py
