@@ -26,7 +26,7 @@ git clone https://github.com/alexandru/claude-config.git ~/.claude &&
     git clone https://github.com/alexandru/claude-config.git /tmp/claude-config
     echo
     # Sync all the files from clone to your working dir
-    rsync -rcv /tmp/claude-config/ ~/.claude/
+    rsync -rlcv /tmp/claude-config/ ~/.claude/
     # Doing some index cleanup
     cd ~/.claude
     git pull
@@ -136,7 +136,7 @@ Start a Solo session with `claude --agent Solo`.
 
 ## Shared skills
 
-- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.2.1)
+- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.2.2)
   - `code-review`: user-invoked adapter for `code-reviewing`.
   - `code-reviewing`: review changed code for bugs, structural problems, performance issues, and unintended behavior.
   - `code-refine`: behavior-preserving refinement using the `code-refinements` lenses.
