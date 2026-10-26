@@ -99,7 +99,7 @@ Start a Solo session with `claude --agent Solo`.
 
 ## Shared skills
 
-- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.2.2)
+- [alexandru/skills](https://github.com/alexandru/skills/tree/v13.2.6)
   - `code-review`: user-invoked adapter for `code-reviewing`.
   - `code-reviewing`: review changed code for bugs, structural problems, performance issues, and unintended behavior.
   - `code-refine`: behavior-preserving refinement using the `code-refinements` lenses.
