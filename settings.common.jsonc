@@ -9,7 +9,7 @@
     "defaultMode": "auto",
     "additionalDirectories": [
       "~/.agents/librarian",
-      "~/.agents/sessions/claude",
+      "/tmp/claude",
     ],
     "deny": [
       // Built-in subagents duplicate the configured roles.
