@@ -76,8 +76,6 @@ Start a Solo session with `claude --agent Solo`.
   - `teach`: teach the user a topic through a stateful learning workspace with lessons and reference documents.
   - `to-spec`: turn the current conversation into a published specification.
   - `to-tickets`: break a plan or specification into tracer-bullet tickets.
-- [VirtusLab/cellar](https://github.com/VirtusLab/cellar/)
-  - `cellar`: query the APIs of JVM dependencies (Scala, Java).
 - [humanlayer/skills](https://github.com/humanlayer/skills)
   - `show-me`: explain the current topic with concise diagrams, code sketches, and focused HTML.
 
